@@ -3,44 +3,29 @@ defineOptions({
   name: 'IndexPage',
 })
 
-const name = ref('')
-
-const router = useRouter()
-function go() {
-  if (name.value)
-    router.push(`/hi/${encodeURIComponent(name.value)}`)
+const subwayCityName = '北京'
+const list = BMapSub.SubwayCitiesList
+let subwaycity = null
+for (let i = 0; i < list.length; i++) {
+  if (list[i].name === subwayCityName) {
+    subwaycity = list[i]
+    break
+  }
 }
+// 获取北京地铁数据-初始化地铁图
+const subway = new BMapSub.Subway('app', subwaycity.citycode)
+subway.setZoom(0.5)
+
+function delLogo() {
+  const parentElement = document.getElementById('app')
+  const firstChildElement = parentElement!.firstChild
+  firstChildElement?.remove()
+}
+delLogo()
 </script>
 
 <template>
-  <div>
-    <div i-carbon-campsite inline-block text-4xl />
-    <p>
-      <a rel="noreferrer" href="https://github.com/antfu/vitesse-lite" target="_blank">
-        Vitesse Lite
-      </a>
-    </p>
-    <p>
-      <em text-sm op75>Opinionated Vite Starter Template</em>
-    </p>
-
-    <div py-4 />
-
-    <TheInput
-      v-model="name"
-      placeholder="What's your name?"
-      autocomplete="false"
-      @keydown.enter="go"
-    />
-
-    <div>
-      <button
-        class="m-3 text-sm btn"
-        :disabled="!name"
-        @click="go"
-      >
-        Go
-      </button>
-    </div>
-  </div>
+  <h1>
+    hello
+  </h1>
 </template>
