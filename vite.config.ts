@@ -49,6 +49,37 @@ export default defineConfig({
     }),
 
     UnoCSS(),
+
+    {
+      name: 'vite-style-tag',
+      enforce: 'pre',
+      transformIndexHtml(html) {
+        // match </head> and insert a <style> tag before it
+        html = html.replace(
+          /<\/head>/,
+          `
+          <style type="text/css">
+            #bd-DetailInfo .detailInfoContent .detailList {
+              position: relative;
+            }
+            #bd-DetailInfo .detailInfoContent .detailList .bd-lineTime {
+              display: flex;
+              width: 7.2rem;
+              gap: 0.1rem;
+              justify-content: space-between;
+            }
+            #bd-DetailInfo .detailInfoContent .detailList .firstTime {
+              flex: 1;
+            }
+            #bd-DetailInfo .detailInfoContent .detailList .lastTime {
+              flex: 1;
+            }
+          </style>$&
+          `,
+        )
+        return html
+      },
+    },
   ],
 
   server: {
@@ -56,8 +87,8 @@ export default defineConfig({
       '/baidu-map-subway': {
         target: BAIDU_MAP_SUBWAY_SOURCE,
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/baidu-map-subway/, ''),
-      }
-    }
-  }
+        rewrite: (path: string) => path.replace(/^\/baidu-map-subway/, ''),
+      },
+    },
+  },
 })

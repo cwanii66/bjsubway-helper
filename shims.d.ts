@@ -12,3 +12,5 @@ declare global {
   }
 }
 declare const BMapSub: any
+declare const baidu: any
+declare const BMAPSUB_ANCHOR_BOTTOM_RIGHT: string
