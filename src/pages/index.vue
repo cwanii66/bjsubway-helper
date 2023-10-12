@@ -1,7 +1,8 @@
 <script setup lang="ts" generic="T extends any, O extends any">
 import {
+  createBJSearchPanel,
   delLogo,
-  registerBasicEventListener,
+  registerSubwayEventListener,
   subway,
   zoomControl,
 } from '~/service'
@@ -13,9 +14,12 @@ defineOptions({
 subway.setZoom(0.8)
 subway.addControl(zoomControl)
 
-registerBasicEventListener()
+registerSubwayEventListener()
 
 delLogo()
+nextTick(() => {
+  createBJSearchPanel()
+})
 </script>
 
 <template>
