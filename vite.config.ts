@@ -7,8 +7,6 @@ import AutoImport from 'unplugin-auto-import/vite'
 import UnoCSS from 'unocss/vite'
 import VueMacros from 'unplugin-vue-macros/vite'
 
-const BAIDU_MAP_SUBWAY_SOURCE = 'https://api.map.baidu.com/api?type=subway&v=1.0&ak=aowd7kUD5soONt549QHZBGyLcZP7hVON'
-
 export default defineConfig({
   resolve: {
     alias: {
@@ -81,13 +79,13 @@ export default defineConfig({
       },
     },
   ],
-
   server: {
     proxy: {
-      '/baidu-map-subway': {
-        target: BAIDU_MAP_SUBWAY_SOURCE,
+      // proxy all request for https://api.map.baidu.com/ from local
+      '/api': {
+        target: 'https://api.map.baidu.com/',
         changeOrigin: true,
-        rewrite: (path: string) => path.replace(/^\/baidu-map-subway/, ''),
+        rewrite: path => path.replace(/^\/api/, ''),
       },
     },
   },
