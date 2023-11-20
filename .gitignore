@@ -8,3 +8,5 @@ node_modules
 .idea/
 *.log
 json/
+_data/
+baidu.*

@@ -11,9 +11,7 @@ class RequestUtil {
       const error = new SyntaxError('JSON.parse error')
       // eslint-disable-next-line no-console
       console.warn(
-        `
-        ${error.name}: ${error.message}\n\trequest: ${url} response data is not json format, \n\tplease ensure the response data is json format.
-        `.trim(),
+        `${error.name}: ${error.message}\n\trequest: ${url} response data is not json format, \n\tplease ensure the response data is json format.`.trim(),
       )
       return textData
     }

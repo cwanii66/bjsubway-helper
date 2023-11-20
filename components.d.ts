@@ -7,8 +7,8 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    BJSMap: typeof import('./src/components/BJSMap.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    SearchWidget: typeof import('./src/components/SearchWidget.vue')['default']
   }
 }

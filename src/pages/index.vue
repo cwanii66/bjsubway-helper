@@ -1,27 +1,64 @@
+<!-- eslint-disable no-console -->
 <script setup lang="ts" generic="T extends any, O extends any">
-import {
-  createBJSearchPanel,
-  delLogo,
-  registerSubwayEventListener,
-  subway,
-  zoomControl,
-} from '~/service'
+import BJSMap from '~/components/BJSMap.vue'
+import { sideController } from '~/service'
 
 defineOptions({
   name: 'IndexPage',
 })
 
-subway.setZoom(0.8)
-subway.addControl(zoomControl)
-
-registerSubwayEventListener()
-
-delLogo()
-nextTick(() => {
-  createBJSearchPanel()
-})
+const {
+  ruleForm,
+  ruleFormRef,
+  rules,
+  formSize,
+  options,
+  submitForm,
+  resetForm,
+} = sideController
 </script>
 
 <template>
-  <div container />
+  <aside position-absolute z-999>
+    <el-form
+      ref="ruleFormRef"
+      :model="ruleForm"
+      :rules="rules"
+      label-width="120px"
+      class="demo-ruleForm"
+      :size="formSize"
+      status-icon
+    >
+      <el-form-item label="请输入起点" prop="region">
+        <el-select v-model="ruleForm.region" placeholder="Please enter start point...">
+          <el-option label="Zone one" value="shanghai" />
+          <el-option label="Zone two" value="beijing" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="请输入终点" prop="region">
+        <el-select v-model="ruleForm.region" placeholder="Please enter end point...">
+          <el-option label="Zone one" value="shanghai" />
+          <el-option label="Zone two" value="beijing" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="请选择策略" prop="count">
+        <el-select-v2
+          v-model="ruleForm.count"
+          placeholder="Activity count"
+          :options="options"
+        />
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="submitForm(ruleFormRef)">
+          查询
+        </el-button>
+        <el-button @click="resetForm(ruleFormRef)">
+          重置
+        </el-button>
+      </el-form-item>
+    </el-form>
+  </aside>
+  <div>
+    <BJSMap />
+  </div>
 </template>
