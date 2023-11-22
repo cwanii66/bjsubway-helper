@@ -1,6 +1,9 @@
 import { Request } from '~/utils'
+import sd from '~/_data/bj-subway.json'
 
-export async function getSubwayData(url) {
+export const subwayData = sd.subways.l // 所有原始线路数据
+
+export async function getSubwayData(url) { // online
   const subwayData = await Request.get(url)
   return subwayData.subways.l // 所有原始线路数据
 }

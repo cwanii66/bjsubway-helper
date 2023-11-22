@@ -4,13 +4,12 @@
 /* eslint-disable no-invalid-this */
 import * as d3 from 'd3'
 import $ from 'jquery'
-import { Subway } from './data'
-import subwayData from '~/_data/bj-subway.json'
+import { Subway, subwayData } from './data'
 
 // import { bdSubwayUrl } from '~/constants'
 
 export function createRenderer() {
-  const subway = new Subway(subwayData.subways.l)
+  const subway = new Subway(subwayData) // local
 
   // let deviceWidth = document.body.offsetWidth;
   // let deviceWidth = 1920

@@ -2,9 +2,8 @@
 import { createRenderer } from '~/service/render'
 
 let scale
-
 onMounted(async () => {
-  scale = createRenderer()
+  scale = createRenderer().scale
 })
 </script>
 
@@ -13,11 +12,11 @@ onMounted(async () => {
     <div id="sw">
       <div id="menu" />
       <div id="scale">
-        <div onclick="scale(1)" class="plus">
+        <div @click="scale(1)" class="plus">
           +
         </div>
         <hr>
-        <div onclick="scale(0)" class="minu">
+        <div @click="scale(0)" class="minu">
           -
         </div>
       </div>

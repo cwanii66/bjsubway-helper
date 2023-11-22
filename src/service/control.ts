@@ -1,92 +1,66 @@
 /* eslint-disable no-console */
 import type { FormInstance, FormRules } from 'element-plus'
 import type { Ref } from 'vue'
+import { subwayData } from './data'
 
 interface RuleForm {
-  name: string
-  region: string
-  count: string
-  date1: string
-  date2: string
-  delivery: boolean
-  type: string[]
-  resource: string
-  desc: string
+  start: string
+  end: string
+  plan: number
 }
 
 const formSize = ref('default')
 const ruleFormRef = ref<FormInstance>()
 const ruleForm = reactive<RuleForm>({
-  name: 'Hello',
-  region: '',
-  count: '',
-  date1: '',
-  date2: '',
-  delivery: false,
-  type: [],
-  resource: '',
-  desc: '',
+  start: '',
+  end: '',
+  plan: 0,
 })
 
 const rules = reactive<FormRules<RuleForm>>({
-  name: [
-    { required: true, message: 'Please input Activity name', trigger: 'blur' },
-    { min: 3, max: 5, message: 'Length should be 3 to 5', trigger: 'blur' },
-  ],
-  region: [
+  start: [
     {
       required: true,
-      message: 'Please select Activity zone',
+      message: '请选择起始站！',
       trigger: 'change',
     },
   ],
-  count: [
+  end: [
     {
       required: true,
-      message: 'Please select Activity count',
+      message: '请选择终点站！',
       trigger: 'change',
     },
   ],
-  date1: [
-    {
-      type: 'date',
-      required: true,
-      message: 'Please pick a date',
-      trigger: 'change',
-    },
-  ],
-  date2: [
-    {
-      type: 'date',
-      required: true,
-      message: 'Please pick a time',
-      trigger: 'change',
-    },
-  ],
-  type: [
-    {
-      type: 'array',
-      required: true,
-      message: 'Please select at least one activity type',
-      trigger: 'change',
-    },
-  ],
-  resource: [
+  plan: [
     {
       required: true,
-      message: 'Please select activity resource',
+      message: '请选择换乘计划',
       trigger: 'change',
     },
-  ],
-  desc: [
-    { required: true, message: 'Please input activity form', trigger: 'blur' },
   ],
 })
 
-const options = Array.from({ length: 10000 }).map((_, idx) => ({
-  value: `${idx + 1}`,
-  label: `${idx + 1}`,
-}))
+const options = [
+  {
+    value: 0,
+    label: '换乘最少',
+  },
+  {
+    value: 1,
+    label: '用时最短',
+  },
+]
+
+export const lineNames = subwayData.map(line => line.l_xmlattr.lb)
+export const stations = subwayData.map((line) => {
+  return line.p.map((station) => {
+    return {
+      name: station.p_xmlattr.lb,
+      key: station.p_xmlattr.sid,
+    }
+  })
+}).flat()
 
 class SideController {
   private static instance: SideController
@@ -94,7 +68,7 @@ class SideController {
   ruleFormRef: Ref<FormInstance | undefined>
   ruleForm: RuleForm
   rules: FormRules<RuleForm>
-  options: { value: string; label: string }[]
+  options: { value: number; label: string }[]
 
   static getSideController() {
     // 单例模式
