@@ -1,11 +1,7 @@
 <!-- eslint-disable no-console -->
 <script setup lang="ts" generic="T extends any, O extends any">
 import BJSMap from '~/components/BJSMap.vue'
-import { sideController } from '~/service'
-
-defineOptions({
-  name: 'IndexPage',
-})
+import { sideController } from '~/service/control'
 
 const {
   ruleForm,
@@ -19,7 +15,7 @@ const {
 </script>
 
 <template>
-  <aside position-absolute z-999>
+  <aside bg-white p-3 position-absolute z-999>
     <el-form
       ref="ruleFormRef"
       :model="ruleForm"
@@ -58,7 +54,7 @@ const {
       </el-form-item>
     </el-form>
   </aside>
-  <div>
+  <div class="map-container">
     <BJSMap />
   </div>
 </template>

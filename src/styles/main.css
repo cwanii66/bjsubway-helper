@@ -9,3 +9,144 @@ body,
 html.dark {
   background: #121212;
 }
+
+* {
+  margin: 0;
+  padding: 0;
+}
+.wrap {
+  width: 100%;
+  height: 100vh;
+  position: relative;
+}
+#sw {
+  width: 100%;
+  height: 100%;
+  display: inline-block;
+  position: relative;
+}
+.bjs-svg-container {
+  display: inline-block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  /*padding-bottom: 100%; !* aspect ratio *!*/
+  vertical-align: top;
+  overflow: hidden;
+}
+.svg-content-responsive {
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+#scale {
+  position: absolute;
+  z-index: 100;
+  right: 26px;
+  bottom: 40px;
+  width: 50px;
+  height: 100px;
+  box-shadow: 0 0 4px rgba(100,100,100,0.5);
+  background-color: rgba(255,255,255,0.9);
+}
+#btn {
+  width: 200px;
+  display: inline-block;
+  vertical-align: top;
+}
+svg {
+  /* border: 1px solid #000000; */
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+  width: 1920px;
+  height: 1080px;
+}
+#menu {
+  position: absolute;
+  z-index: 100;
+  right: 10px;
+  top: 10px;
+  background: rgba(255,255,255,0.9);
+  padding: 5px;
+  width: auto;
+  height: auto;
+  border: 1px solid #ccc;
+}
+#scale div {
+  height: 50px;
+  width: 50px;
+  line-height: 44px;
+  text-align: center;
+  font-size: 40px;
+}
+.name-box {
+  display: flex;
+}
+.subway-col div:hover {
+  background-color: #cccccc;
+  cursor: pointer;
+}
+.p_mark {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  position: relative;
+  bottom: 2px;
+  margin: 0 4px;
+}
+.p_name {
+  font-size: 14px;
+  color: #4c4c4c;
+  font-family: Arial,Helvetica,SimSun,sans-serif;
+}
+#tooltip {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 320px;
+  background: #333;
+  padding: 4px;
+  box-sizing: border-box;
+}
+#tool-head {
+  text-align: center;
+  line-height: 22px;
+  color: #ffffff;
+  font-size: 12px;
+  padding-bottom: 4px;
+  position: relative;
+}
+.deletes {
+  position: absolute;
+  right: -4px;
+  top: 2px;
+  font-size: 30px;
+  line-height: 14px;
+  vertical-align: middle;
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  cursor:pointer
+}
+#tool-body {
+  background: #ffffff;
+  line-height: 22px;
+  font-size: 12px;
+  padding: 6px 2px 0;
+  box-sizing: border-box;
+}
+.tool-content {
+  padding-bottom: 6px;
+}
+.content-left {
+  display: inline-block;
+  width: 70px;
+  text-align: center;
+  vertical-align: top;
+}
+.content-right {
+  display: inline-block;
+  width: 210px;
+}
