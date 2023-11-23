@@ -1,12 +1,19 @@
 /* eslint-disable no-console */
 import type { FormInstance, FormRules } from 'element-plus'
 import type { Ref } from 'vue'
+import { ElMessageBox } from 'element-plus'
 import { subwayData } from './data'
+import { slCon } from './calc'
 
 interface RuleForm {
   start: string
   end: string
   plan: number
+}
+
+interface SearchResult {
+  path: string[]
+  count: number
 }
 
 const formSize = ref('default')
@@ -70,6 +77,8 @@ class SideController {
   rules: FormRules<RuleForm>
   options: { value: number; label: string }[]
 
+  searchResult!: SearchResult | null
+
   static getSideController() {
     // 单例模式
     if (!this.instance)
@@ -85,15 +94,27 @@ class SideController {
     this.options = options
   }
 
-  async submitForm(formEl: FormInstance | undefined) {
-    if (!formEl)
-      return
-    await formEl.validate((valid, fields) => {
-      if (valid)
-        console.log('submit!')
-      else
-        console.log('error submit!', fields)
-    })
+  async submitForm(ruleForm: RuleForm) {
+    const { start, end } = ruleForm
+    this.searchResult = slCon.getSearchResult(start, end)
+  }
+
+  showSearchMessage() {
+    ElMessageBox.confirm(
+      `
+      <p>从${this.ruleForm.start}到${this.ruleForm.end}的最佳线路为:</p>
+      <p>${this.searchResult?.path.join(' → ')}</p>
+      <br>
+      总共坐了${this.searchResult!.count + 1}站.
+      `,
+      '查询结果',
+      {
+        confirmButtonText: '好的',
+        cancelButtonText: '取消',
+        dangerouslyUseHTMLString: true,
+        type: 'success',
+      },
+    ).catch(() => {})
   }
 
   resetForm(formEl: FormInstance | undefined) {

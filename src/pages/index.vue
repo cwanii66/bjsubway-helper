@@ -11,6 +11,7 @@ const {
   options,
   submitForm,
   resetForm,
+  showSearchMessage,
 } = sideController
 </script>
 
@@ -45,7 +46,7 @@ const {
         />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="submitForm(ruleFormRef)">
+        <el-button type="primary" @click="submitForm(ruleForm), showSearchMessage()">
           查询
         </el-button>
         <el-button @click="resetForm(ruleFormRef)">

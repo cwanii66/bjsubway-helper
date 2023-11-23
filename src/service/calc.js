@@ -1,7 +1,7 @@
 import { ElMessage } from 'element-plus'
 import { BeanLine, hashSubwayData } from './data'
 
-// import { edgesData } from './const'
+// import { edgesData } from '~/constants'
 
 // // Dijkstra算法
 // const Dijkstra = (function () {
@@ -88,23 +88,29 @@ import { BeanLine, hashSubwayData } from './data'
 
 // initDijkstra()
 
-export class SLConnection {
+class SLConnection {
+  static slCon = new SLConnection()
+
   constructor() {
-    this.stationMap = new Map()
+    this.stationMap = new Map() // 站点名 -> 站点
     this.lineSet = []
   }
 
-  static start() {
-    const slCon = new SLConnection()
-    slCon.init()
+  getSearchResult(start, end) {
+    this.init()
+
+    if (this._check(start, end))
+      return null
+
+    return SLConnection.slCon._searchRoute(this.stationMap, start, end)
   }
 
   // 完成station & line的初始化
   init() {
-    Object.entries(hashSubwayData).forEach((tuple) => {
+    for (const tuple of hashSubwayData) {
       const line = new BeanLine(tuple)
       this.lineSet.push(line)
-    })
+    }
 
     for (const line of this.lineSet) {
       line.getSubStation().forEach((station, index) => {
@@ -136,34 +142,34 @@ export class SLConnection {
     }
   }
 
-  searchRoute(stationMap, start, end) {
+  _searchRoute(stationMap, start, end) {
     const queue = []
     let nextStart = null
     let neighborSize = 0
     let temp = null
     let isFind = 0
 
-    // 等距图中，单源最短距离计算，使用BFS代替Dijkstra
-    queue.push(stationMap[start]) // 将起点放入队列
-    stationMap[start].isVisited = 1 // 起点已访问
+    // 假设站点等距，使用宽度优先搜索
+    queue.push(stationMap.get(start)) // 将起点放入队列
+    stationMap.get(start).isVisited = 1 // 起点已访问
 
     while (queue.length > 0) {
       nextStart = queue[0].getStationName()
-      neighborSize = stationMap[nextStart].neighborStation.length
+      neighborSize = stationMap.get(nextStart).neighborStation.length
 
       for (let i = 0; i < neighborSize; i++) {
-        temp = stationMap[nextStart].neighborStation[i].stationName
+        temp = stationMap.get(nextStart).neighborStation[i].stationName
 
         // 找到终点
         if (temp === end) {
-          stationMap[temp].parent = nextStart
+          stationMap.get(temp).parent = nextStart
           isFind = 1
           break
         }
-        else if (stationMap[temp].isVisited === 0) { // 若未被访问过
-          stationMap[temp].parent = nextStart // 设父亲节点
-          stationMap[temp].isVisited = 1 // 该点被访问
-          queue.push(stationMap[temp]) // 加入队列
+        else if (stationMap.get(temp).isVisited === 0) { // 若未被访问过
+          stationMap.get(temp).parent = nextStart // 设父亲节点
+          stationMap.get(temp).isVisited = 1 // 该点被访问
+          queue.push(stationMap.get(temp)) // 加入队列
           // 必须先设父节点、改边isVisited，再放入queue，否则节点未更新，无限循环
           // 应该找到map对应键值更新父节点和 visit，而不是在 map 对应键值的邻居节点的父节点和 visit 进行更新, 故增加 temp
         }
@@ -174,10 +180,10 @@ export class SLConnection {
       queue.shift()
     }
 
-    this.getPath(end)
+    return this._getPath(end)
   }
 
-  getPath(end) {
+  _getPath(end) {
     let count = 0
     // 需要判断相隔一个站点的两个站是否在一条线路上，用数组比栈方便
     const path = []
@@ -187,7 +193,7 @@ export class SLConnection {
     // 回溯父节点
     while (station.getParent() !== null) {
       path.push(station.getStationName())
-      station = this.StationMap.get(station.getParent())
+      station = this.stationMap.get(station.getParent())
       count++
     }
     path.push(station.getStationName()) // 加入起点
@@ -203,13 +209,15 @@ export class SLConnection {
     let isFinished = false
     if (!this.stationMap.has(start) || !this.stationMap.has(end)) {
       isFinished = true
-      ElMessage.warning('输入的站点不存在')
+      ElMessage.warning('输入的站点不存在，请重新输入')
       return isFinished
     }
     if (start === end) {
       isFinished = true
-      ElMessage.warning('输入的站点相同')
+      ElMessage.warning('输入的站点相同，请重新输入')
       return isFinished
     }
   }
 }
+
+export const slCon = SLConnection.slCon
