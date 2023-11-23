@@ -28,12 +28,12 @@ const {
       mt-6
     >
       <el-form-item label="请输入起点" prop="start">
-        <el-select v-model="ruleForm.start" placeholder="Please enter start point...">
+        <el-select v-model="ruleForm.start" placeholder="Select start point...">
           <el-option v-for="point in stations" :key="point.key" :label="point.name" :value="point.name" />
         </el-select>
       </el-form-item>
       <el-form-item label="请输入终点" prop="end">
-        <el-select v-model="ruleForm.end" placeholder="Please enter end point...">
+        <el-select v-model="ruleForm.end" placeholder="Select end point...">
           <el-option v-for="point in stations" :key="point.key" :label="point.name" :value="point.name" />
         </el-select>
       </el-form-item>

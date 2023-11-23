@@ -3,6 +3,13 @@ import sd from '~/_data/bj-subway.json'
 
 export const subwayData = sd.subways.l // 所有原始线路数据
 
+export const hashSubwayData = new Map()
+
+subwayData.forEach((line) => {
+  const curStationArr = line.p.map(station => station.p_xmlattr.lb)
+  hashSubwayData.set(line.l_xmlattr.lb, curStationArr)
+})
+
 export async function getSubwayData(url) { // online
   const subwayData = await Request.get(url)
   return subwayData.subways.l // 所有原始线路数据
@@ -262,5 +269,89 @@ export class Subway {
       }
     }
     return str
+  }
+}
+
+export class BeanStation {
+  constructor() {
+    this.stationName = null // 站名
+    this.belongsToLine = [] // 所属线名
+    this.neighborStation = [] // 邻接站点，相当于创建邻接表
+    this.isVisited = 0 // 是否被访问
+    this.parent = null // 上一站点
+  }
+
+  getStationName() {
+    return this.stationName
+  }
+
+  setStationName(stationName) {
+    this.stationName = stationName
+  }
+
+  getBelongsToLine() {
+    return this.belongsToLine
+  }
+
+  addBelongsToLine(lineName) {
+    this.belongsToLine.push(lineName)
+  }
+
+  setBelongsToLine(belongsToLine) {
+    this.belongsToLine = belongsToLine
+  }
+
+  getNeighborStation() {
+    return this.neighborStation
+  }
+
+  setNeighborStation(neighborStation) {
+    this.neighborStation = neighborStation
+  }
+
+  getIsVisited() {
+    return this.isVisited
+  }
+
+  setIsVisited(isVisited) {
+    this.isVisited = isVisited
+  }
+
+  getParent() {
+    return this.parent
+  }
+
+  setParent(parent) {
+    this.parent = parent
+  }
+}
+
+export class BeanLine {
+  constructor(beanSubwayData) {
+    const lineArr = beanSubwayData
+    this.lineName = lineArr[0] // 线名
+    this.subStation = [] // 子站名
+
+    for (let i = 1; i < lineArr[1].length; i++) {
+      const station = new BeanStation()
+      station.setStationName(lineArr[1][i])
+      this.subStation.push(station)
+    }
+  }
+
+  getLineName() {
+    return this.lineName
+  }
+
+  setLineName(lineName) {
+    this.lineName = lineName
+  }
+
+  getSubStation() {
+    return this.subStation
+  }
+
+  setSubStation(subStation) {
+    this.subStation = subStation
   }
 }
