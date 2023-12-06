@@ -1,19 +1,15 @@
 /* eslint-disable no-console */
 import type { FormInstance, FormRules } from 'element-plus'
 import type { Ref } from 'vue'
+import { reactive, ref } from 'vue'
 import { ElMessageBox } from 'element-plus'
-import { subwayData } from './data'
-import { slCon } from './calc'
+import { createSubwayMap, reloadData, subwayData } from './data'
+import { createIntersectionMatrix, leastExchange } from './calc'
 
 interface RuleForm {
   start: string
   end: string
   plan: number
-}
-
-interface SearchResult {
-  path: string[]
-  count: number
 }
 
 const formSize = ref('default')
@@ -59,15 +55,23 @@ const options = [
   },
 ]
 
+export function dedupeArray<T>(array: T[]): T[] {
+  return Array.from(new Set(array))
+}
+
 export const lineNames = subwayData.map(line => line.l_xmlattr.lb)
-export const stations = subwayData.map((line) => {
-  return line.p.map((station) => {
-    return {
-      name: station.p_xmlattr.lb,
-      key: station.p_xmlattr.sid,
-    }
-  })
-}).flat()
+export const stations = dedupeArray(
+  subwayData.map((line) => {
+    return line.p
+      .filter(station => station.p_xmlattr.st)
+      .map((station) => {
+        return {
+          name: station.p_xmlattr.lb,
+          key: station.p_xmlattr.sid,
+        }
+      })
+  }).flat(),
+)
 
 class SideController {
   private static instance: SideController
@@ -77,7 +81,7 @@ class SideController {
   rules: FormRules<RuleForm>
   options: { value: number; label: string }[]
 
-  searchResult!: SearchResult | null
+  searchResult!: any
 
   static getSideController() {
     // 单例模式
@@ -95,17 +99,25 @@ class SideController {
   }
 
   async submitForm(ruleForm: RuleForm) {
-    const { start, end } = ruleForm
-    this.searchResult = slCon.getSearchResult(start, end)
+    const { lines_data, weights } = reloadData()
+    const [station_dict, line_dict] = createSubwayMap(lines_data, weights)
+
+    const intersectionMatrix = createIntersectionMatrix(line_dict)
+    this.searchResult = leastExchange(intersectionMatrix, line_dict, station_dict, ruleForm.start, ruleForm.end)
   }
 
   showSearchMessage() {
+    if (!this.searchResult)
+      return
+
+    // console.log('search result: ', this.searchResult)
+
     ElMessageBox.confirm(
       `
       <p>从${this.ruleForm.start}到${this.ruleForm.end}的最佳线路为:</p>
-      <p>${this.searchResult?.path.join(' → ')}</p>
+      <p>${this.searchResult[1]}</p>
       <br>
-      总共坐了${this.searchResult!.count + 1}站.
+      <p>总共坐了${this.searchResult[0]}分钟.</p>
       `,
       '查询结果',
       {

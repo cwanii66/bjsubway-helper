@@ -3,7 +3,8 @@
 /* eslint-disable style/no-tabs */
 /* eslint-disable no-invalid-this */
 import * as d3 from 'd3'
-import $ from 'jquery'
+
+// import $ from 'jquery'
 import { Subway, subwayData } from './data'
 
 // import { bdSubwayUrl } from '~/constants'
@@ -62,36 +63,36 @@ export function createRenderer() {
   const pathArray = subway.getPathArray()
   const pointArray = subway.getPointArray()
 
-  function getData() {
-    $.ajax({
-      // 请求方式
-      type: 'GET',
-      contentType: 'application/json;charset=UTF-8',
-      // url : "http://39.105.60.124:9535/interface/sealing/selectAll",
-      url: 'http://192.168.43.119:8080/interface/sealing/selectAll',
-      success(data) {
-        const result = JSON.parse(data)
-        const data0 = result.data0
-        const data1 = result.data1
-        renderBugLine(data0)
-        renderBugPoint(data1)
-      },
-      error(e) {
-        console.log('数据请求失败：', e.statusText)
-      },
-    })
-  }
+  // function getData() {
+  //   $.ajax({
+  //     // 请求方式
+  //     type: 'GET',
+  //     contentType: 'application/json;charset=UTF-8',
+  //     // url : "http://39.105.60.124:9535/interface/sealing/selectAll",
+  //     url: 'http://192.168.43.119:8080/interface/sealing/selectAll',
+  //     success(data) {
+  //       const result = JSON.parse(data)
+  //       const data0 = result.data0
+  //       const data1 = result.data1
+  //       renderBugLine(data0)
+  //       renderBugPoint(data1)
+  //     },
+  //     error(e) {
+  //       console.log('数据请求失败：', e.statusText)
+  //     },
+  //   })
+  // }
 
   // renderBugLine(datas1);
   // renderBugPoint(datas2);
   renderBugLine([])
   renderBugPoint([])
-  getData()
+  // getData()
 
   // 定期请求数据
-  setInterval(() => {
-    getData()
-  }, 1000 * 60)
+  // setInterval(() => {
+  //   getData()
+  // }, 1000 * 60)
 
   renderInventLine()
   renderAllStation()

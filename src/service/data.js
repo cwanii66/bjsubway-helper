@@ -6,7 +6,9 @@ export const subwayData = sd.subways.l // 所有原始线路数据
 export const hashSubwayData = new Map()
 
 subwayData.forEach((line) => {
-  const curStationArr = line.p.map(station => station.p_xmlattr.lb)
+  const curStationArr = line.p
+    .filter(station => station.p_xmlattr.st) // st 标记是否是站点
+    .map(station => [station.p_xmlattr.lb, station.p_xmlattr.ex, +(station.p_xmlattr?.int ?? 5)]) // [[站名, 是否换乘站, 权值int], ...]]
   hashSubwayData.set(line.l_xmlattr.lb, curStationArr)
 })
 
@@ -15,7 +17,67 @@ export async function getSubwayData(url) { // online
   return subwayData.subways.l // 所有原始线路数据
 }
 
-export class Subway {
+export function reloadData() {
+  const lines_data = Object.create(null)
+  const weights = Object.create(null)
+
+  for (const [line_name, stations] of hashSubwayData) {
+    lines_data[line_name] = []
+    // eslint-disable-next-line no-unused-vars, unused-imports/no-unused-vars
+    for (const [station_name, is_change, station_time] of stations) {
+      if (!Object.hasOwn(weights, station_name))
+        weights[station_name] = station_time
+
+      lines_data[line_name].push(station_name)
+    }
+  }
+
+  return {
+    lines_data,
+    weights,
+  }
+}
+
+export function createSubwayMap(lines_data, weights) {
+  const station_dict = Object.create(null)
+  const line_dict = Object.create(null)
+
+  for (const line_name in lines_data) {
+    const line = lines_data[line_name]
+    const subLine = new Line(line_name)
+
+    for (const station_name of line) {
+      subLine.addStation(station_name)
+      if (!Reflect.has(station_dict, station_name))
+        station_dict[station_name] = new Station(station_name)
+    }
+
+    line_dict[line_name] = subLine
+  }
+
+  for (const line_name in lines_data) {
+    const line = lines_data[line_name]
+    const line_length = line.length
+
+    for (let i = 0; i < line_length - 1; i++) {
+      const main_station = line[i]
+      const neibor_station = line[i + 1]
+      station_dict[main_station].addNeibor(neibor_station, weights[neibor_station])
+    }
+
+    for (let i = line_length - 1; i > 0; i--) {
+      const main_station = line[i]
+      const neibor_station = line[i - 1]
+
+      if (!station_dict[main_station].getNeibors().includes(neibor_station))
+        station_dict[main_station].addNeibor(neibor_station, weights[neibor_station])
+    }
+  }
+
+  return [station_dict, line_dict]
+}
+
+export class Subway { // use for painting
   constructor(data) {
     this.data = data
     this.bugLineArray = []
@@ -353,5 +415,111 @@ export class BeanLine {
 
   setSubStation(subStation) {
     this.subStation = subStation
+  }
+}
+
+export class Station {
+  constructor(station_name) {
+    this.station_name = station_name
+    this.neibor_stations = {}
+    this.change = false
+  }
+
+  addNeibor(station_name, timecost) {
+    this.neibor_stations[station_name] = timecost
+  }
+
+  getNeibors() {
+    return Object.keys(this.neibor_stations)
+  }
+
+  getNeiborWeight(neibor) {
+    return this.neibor_stations[neibor]
+  }
+
+  imchange() {
+    this.change = true
+  }
+}
+
+export class Line {
+  constructor(line_name) {
+    this.line_name = line_name
+    this.stations = []
+  }
+
+  addStation(station_name) {
+    this.stations.push(station_name)
+  }
+
+  intersectWith(other_line) {
+    return this.stations.some(station => other_line.stations.includes(station))
+  }
+
+  inLine(station_name) {
+    return this.stations.includes(station_name)
+  }
+
+  getExStations(other_line) {
+    return this.stations.filter(station => other_line.stations.includes(station))
+  }
+
+  getRouteInLine(station1, station2, station_map) {
+    const pos1 = this.stations.indexOf(station1)
+    const pos2 = this.stations.indexOf(station2)
+    let route
+
+    if (pos1 > pos2)
+      route = this.stations.slice(pos2, pos1 + 1).reverse()
+    else
+      route = this.stations.slice(pos1, pos2 + 1)
+
+    const size = route.length
+    let cost = 0
+    const retRoute = []
+
+    retRoute.push(route[0]) // 起点
+
+    for (let i = 0; i < size - 1; i++) {
+      const st1_name = route[i]
+      const st2_name = route[i + 1]
+      retRoute.push(st2_name)
+      const st1 = station_map[st1_name]
+      cost += st1.getNeiborWeight(st2_name)
+    }
+
+    return [cost, retRoute]
+  }
+}
+
+export class Selection {
+  constructor(station_name, height, timecost = 0, parent = null) {
+    this.station_name = station_name
+    this.timecost = timecost
+    this.height = height
+    this.parent = parent
+  }
+
+  inPath(station_name) {
+    let ok = 0
+    let cur_node = this
+    while (!ok && cur_node) {
+      if (cur_node.station_name === station_name)
+        ok = 1
+
+      cur_node = cur_node.parent
+    }
+    return ok
+  }
+
+  displayPath() {
+    let cur_node = this
+    const path = []
+    while (cur_node) {
+      path.push(cur_node.station_name)
+      cur_node = cur_node.parent
+    }
+    path.reverse()
+    return path
   }
 }

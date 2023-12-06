@@ -3,6 +3,9 @@
 import BJSMap from '~/components/BJSMap.vue'
 import { sideController, stations } from '~/service/control'
 
+import { Request } from '~/utils'
+import { bdSubwayUrl } from '~/constants'
+
 const {
   ruleForm,
   ruleFormRef,
@@ -13,6 +16,10 @@ const {
   resetForm,
   showSearchMessage,
 } = sideController
+
+Request.get(bdSubwayUrl).then(() => {
+  // console.log(res.subways.l)
+})
 </script>
 
 <template>
@@ -29,12 +36,12 @@ const {
       mt-6
     >
       <el-form-item label="请输入起点" prop="start">
-        <el-select v-model="ruleForm.start" placeholder="Select start point...">
+        <el-select filterable v-model="ruleForm.start" placeholder="Select start point...">
           <el-option v-for="point in stations" :key="point.key" :label="point.name" :value="point.name" />
         </el-select>
       </el-form-item>
       <el-form-item label="请输入终点" prop="end">
-        <el-select v-model="ruleForm.end" placeholder="Select end point...">
+        <el-select filterable v-model="ruleForm.end" placeholder="Select end point...">
           <el-option v-for="point in stations" :key="point.key" :label="point.name" :value="point.name" />
         </el-select>
       </el-form-item>

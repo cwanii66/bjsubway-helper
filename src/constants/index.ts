@@ -264,3 +264,6 @@ export const edgesData = [
   ['义和庄', '生物医药基地', 2.9],
   ['生物医药基地', '天宫院', 1.8],
 ]
+export const MAX = 2 * 100
+export const min_total_cost = MAX
+export const best_exchange_way = undefined
