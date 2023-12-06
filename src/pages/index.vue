@@ -14,7 +14,6 @@ const {
   options,
   submitForm,
   resetForm,
-  showSearchMessage,
 } = sideController
 
 Request.get(bdSubwayUrl).then(() => {
@@ -53,7 +52,7 @@ Request.get(bdSubwayUrl).then(() => {
         />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="submitForm(ruleForm), showSearchMessage()">
+        <el-button type="primary" @click="submitForm.call(sideController, ruleForm)">
           查询
         </el-button>
         <el-button @click="resetForm(ruleFormRef)">

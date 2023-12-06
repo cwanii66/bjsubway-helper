@@ -129,11 +129,8 @@ export class Subway { // use for painting
         path: arr,
         lc: lc.replace(/0x/, '#'),
         lb,
-
         lbx,
-
         lby,
-
         lid,
       })
     })
@@ -334,90 +331,6 @@ export class Subway { // use for painting
   }
 }
 
-export class BeanStation {
-  constructor() {
-    this.stationName = null // 站名
-    this.belongsToLine = [] // 所属线名
-    this.neighborStation = [] // 邻接站点，相当于创建邻接表
-    this.isVisited = 0 // 是否被访问
-    this.parent = null // 上一站点
-  }
-
-  getStationName() {
-    return this.stationName
-  }
-
-  setStationName(stationName) {
-    this.stationName = stationName
-  }
-
-  getBelongsToLine() {
-    return this.belongsToLine
-  }
-
-  addBelongsToLine(lineName) {
-    this.belongsToLine.push(lineName)
-  }
-
-  setBelongsToLine(belongsToLine) {
-    this.belongsToLine = belongsToLine
-  }
-
-  getNeighborStation() {
-    return this.neighborStation
-  }
-
-  setNeighborStation(neighborStation) {
-    this.neighborStation = neighborStation
-  }
-
-  getIsVisited() {
-    return this.isVisited
-  }
-
-  setIsVisited(isVisited) {
-    this.isVisited = isVisited
-  }
-
-  getParent() {
-    return this.parent
-  }
-
-  setParent(parent) {
-    this.parent = parent
-  }
-}
-
-export class BeanLine {
-  constructor(beanSubwayData) {
-    const lineArr = beanSubwayData
-    this.lineName = lineArr[0] // 线名
-    this.subStation = [] // 子站名
-
-    for (let i = 1; i < lineArr[1].length; i++) {
-      const station = new BeanStation()
-      station.setStationName(lineArr[1][i])
-      this.subStation.push(station)
-    }
-  }
-
-  getLineName() {
-    return this.lineName
-  }
-
-  setLineName(lineName) {
-    this.lineName = lineName
-  }
-
-  getSubStation() {
-    return this.subStation
-  }
-
-  setSubStation(subStation) {
-    this.subStation = subStation
-  }
-}
-
 export class Station {
   constructor(station_name) {
     this.station_name = station_name
@@ -521,5 +434,100 @@ export class Selection {
     }
     path.reverse()
     return path
+  }
+}
+
+export class Member {
+  constructor(station_name, cost) {
+    this.station_name = station_name
+    this.cost = cost
+    this.parent = null
+  }
+
+  displayPath(mincost) {
+    let cur_node = this
+    const path = []
+    while (cur_node) {
+      path.push(cur_node.station_name)
+      cur_node = cur_node.parent
+    }
+    path.reverse()
+
+    return [mincost, path]
+  }
+}
+
+export class MinHeap {
+  constructor(heapsize) {
+    this.heapsize = heapsize
+    this.heap = []
+  }
+
+  setData(members) {
+    for (const member of members)
+      this.heap.push(member)
+  }
+}
+
+export function holdHeap(minheap, pos) {
+  const left = 2 * pos + 1
+  const right = 2 * pos + 2
+  let minpos = pos
+  // const minvalue = minheap.heap[pos].cost
+
+  if (right < minheap.heapsize && minheap.heap[right].cost < minheap.heap[minpos].cost)
+    minpos = right
+
+  if (left < minheap.heapsize && minheap.heap[left].cost < minheap.heap[minpos].cost)
+    minpos = left
+
+  if (minpos !== pos) {
+    [minheap.heap[pos], minheap.heap[minpos]] = [minheap.heap[minpos], minheap.heap[pos]]
+    holdHeap(minheap, minpos)
+  }
+}
+
+export function initHeap(minheap) {
+  const haslastleaf = Math.floor(minheap.heapsize / 2) - 1
+  for (let i = haslastleaf; i >= 0; i--)
+    holdHeap(minheap, i)
+}
+
+export function emptyHeap(minheap) {
+  return minheap.heapsize === 0
+}
+
+export function topHeap(minheap) {
+  const minMem = minheap.heap[0]
+  minheap.heap[0] = minheap.heap[minheap.heapsize - 1]
+  minheap.heapsize -= 1
+  holdHeap(minheap, 0)
+  return minMem
+}
+
+export function decHeap(minheap, station_name, newcost, parent) {
+  let targetPos = -1
+  for (let i = 0; i < minheap.heapsize; i++) {
+    if (targetPos !== -1)
+      break
+
+    if (minheap.heap[i].station_name === station_name)
+      targetPos = i
+  }
+  if (targetPos <= 0 || minheap.heap[targetPos].cost <= newcost)
+    return
+
+  minheap.heap[targetPos].cost = newcost
+  minheap.heap[targetPos].parent = parent
+
+  let parentPos = Math.floor((targetPos - 1) / 2)
+
+  while (parentPos >= 0) {
+    if (minheap.heap[targetPos].cost >= minheap.heap[parentPos].cost)
+      break;
+
+    [minheap.heap[targetPos], minheap.heap[parentPos]] = [minheap.heap[parentPos], minheap.heap[targetPos]]
+    targetPos = parentPos
+    parentPos = Math.floor((targetPos - 1) / 2)
   }
 }

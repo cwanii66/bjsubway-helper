@@ -207,6 +207,8 @@ export function createRenderer() {
       .text(arr.lb)
   }
 
+  function renderSearchRoute() {}
+
   function renderCurrentPoint(name) {
     const arr = subway.getCurrentPointArray(name)
     for (let i = 0; i < arr.length; i++) {

@@ -4,7 +4,7 @@ import type { Ref } from 'vue'
 import { reactive, ref } from 'vue'
 import { ElMessageBox } from 'element-plus'
 import { createSubwayMap, reloadData, subwayData } from './data'
-import { createIntersectionMatrix, leastExchange } from './calc'
+import { createIntersectionMatrix, dijkstra, leastExchange } from './calc'
 
 interface RuleForm {
   start: string
@@ -72,6 +72,8 @@ export const stations = dedupeArray(
       })
   }).flat(),
 )
+const { lines_data, weights } = reloadData()
+const [station_dict, line_dict] = createSubwayMap(lines_data, weights)
 
 class SideController {
   private static instance: SideController
@@ -99,11 +101,26 @@ class SideController {
   }
 
   async submitForm(ruleForm: RuleForm) {
-    const { lines_data, weights } = reloadData()
-    const [station_dict, line_dict] = createSubwayMap(lines_data, weights)
+    switch (ruleForm.plan) {
+      case 0: // 换乘最少
+        this.minTransferSubmit(ruleForm)
+        break
+      case 1: // 用时最短
+        this.minTimeSubmit(ruleForm)
+        break
+      default:
+        console.error('plan error')
+    }
+    this.showSearchMessage()
+  }
 
+  minTransferSubmit(ruleForm: RuleForm) {
     const intersectionMatrix = createIntersectionMatrix(line_dict)
     this.searchResult = leastExchange(intersectionMatrix, line_dict, station_dict, ruleForm.start, ruleForm.end)
+  }
+
+  minTimeSubmit(ruleForm: RuleForm) {
+    this.searchResult = dijkstra(station_dict, ruleForm.start, ruleForm.end)
   }
 
   showSearchMessage() {
