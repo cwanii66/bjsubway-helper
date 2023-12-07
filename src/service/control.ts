@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 import type { FormInstance, FormRules } from 'element-plus'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { createSubwayMap, reloadData, subwayData } from './data'
-import { createIntersectionMatrix, dijkstra, leastExchange } from './calc'
+import { calcFare1, createIntersectionMatrix, dijkstra, Dijkstra as fixTicketDiji, leastExchange } from './calc'
 
 interface RuleForm {
   start: string
@@ -82,7 +82,15 @@ class SideController {
   options: { value: number; label: string }[]
 
   drawer: Ref<boolean> = ref(false)
-  drawerContent: Ref<string> = ref('')
+  drawerContent: Ref<{
+    route: string
+    int_as_weight: number
+    price: number
+  }> = ref({
+      route: '',
+      int_as_weight: 0,
+      price: 0,
+    })
 
   searchResult!: any
 
@@ -109,7 +117,7 @@ class SideController {
         ElMessage.error('plan error')
     }
     // this.showSearchMessage()
-    this.setDrawer(this.searchResult[1])
+    this.setDrawer(this.searchResult)
     return this.searchResult
   }
 
@@ -122,35 +130,13 @@ class SideController {
     this.searchResult = dijkstra(station_dict, ruleForm.start, ruleForm.end)
   }
 
-  setDrawer(content: string | string[]) {
+  setDrawer(content: [number, string[]]) {
     this.drawer.value = true
-    if (Array.isArray(content))
-      this.drawerContent.value = content.join(' → ')
-    else
-      this.drawerContent.value = content
-  }
-
-  showSearchMessage() {
-    if (!this.searchResult)
-      return
-
-    // console.log('search result: ', this.searchResult)
-
-    ElMessageBox.confirm(
-      `
-      <p>从${this.ruleForm.start}到${this.ruleForm.end}的最佳线路为:</p>
-      <p>${this.searchResult[1]}</p>
-      <br>
-      <p>总共坐了${this.searchResult[0]}分钟.</p>
-      `,
-      '查询结果',
-      {
-        confirmButtonText: '好的',
-        cancelButtonText: '取消',
-        dangerouslyUseHTMLString: true,
-        type: 'success',
-      },
-    ).catch(() => {})
+    this.drawerContent.value.route = content[1].join(' → ')
+    this.drawerContent.value.int_as_weight = content[0]
+    this.drawerContent.value.price = calcFare1(
+      fixTicketDiji.shortestPath(ruleForm.start, ruleForm.end),
+    )
   }
 
   cancelClick() {

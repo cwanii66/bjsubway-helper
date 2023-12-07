@@ -92,8 +92,6 @@ function getAllStObjs() {
   })
 }
 
-function getNonStObjs() {}
-
 function extractStations(stations) {
   const allStObjs = getAllStObjs()
   const allStations = []

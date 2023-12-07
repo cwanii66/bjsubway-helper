@@ -83,7 +83,9 @@ onMounted(() => {
     :lock-scroll="false"
   >
     <template #default>
-      <p>{{ drawerContent }}</p>
+      <p>{{ drawerContent.route }}</p>
+      <p mt-1.2>DATA INT AS WEIGHT：<em font-800 color-pink font-size-6>{{ drawerContent.int_as_weight }}</em>，票价<em font-800 color-pink font-size-6>{{ drawerContent.price }}</em> 元！</p>
+      <p font-size-3 color-stone font-italic>计费公式：起步6公里内每人次3元，6-12公里每人次4元，12-32公里每10公里加1元，32公里以上每20公里加1元，票价不封顶。</p>
     </template>
     <template #footer>
       <div style="flex: auto">
