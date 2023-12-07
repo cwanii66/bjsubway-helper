@@ -77,6 +77,34 @@ export function createSubwayMap(lines_data, weights) {
   return [station_dict, line_dict]
 }
 
+function getAllStObjs() {
+  return subwayData.flatMap((line) => {
+    const { ld: lid, lc, lbx, lby } = line.l_xmlattr
+    return line.p
+      .filter(station => station.p_xmlattr.st)
+      .map(station => ({
+        ...station.p_xmlattr,
+        lid,
+        lc: lc.replace(/0x/, '#'),
+        lbx,
+        lby,
+      }))
+  })
+}
+
+function getNonStObjs() {}
+
+function extractStations(stations) {
+  const allStObjs = getAllStObjs()
+  const allStations = []
+  stations.forEach((station) => {
+    allStations.push(
+      allStObjs.find(st => st.lb === station),
+    )
+  })
+  return allStations
+}
+
 export class Subway { // use for painting
   constructor(data) {
     this.data = data
@@ -231,8 +259,13 @@ export class Subway { // use for painting
         }
       }
     })
-
+    console.log('getCurrentPointArray: ', allStations)
     return allStations
+  }
+
+  getSearchPointArray(stations) {
+    const searchStations = extractStations(stations)
+    return searchStations
   }
 
   getLineNameArray() {

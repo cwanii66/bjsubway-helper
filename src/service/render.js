@@ -207,8 +207,6 @@ export function createRenderer() {
       .text(arr.lb)
   }
 
-  function renderSearchRoute() {}
-
   function renderCurrentPoint(name) {
     const arr = subway.getCurrentPointArray(name)
     for (let i = 0; i < arr.length; i++) {
@@ -559,8 +557,57 @@ export function createRenderer() {
       svg.call(zoom.transform, d3.zoomIdentity.translate((1 - (currentScale - scaleStep)) * transX - ((1 - currentScale) * transX - currentX) * (currentScale - scaleStep) / currentScale, (1 - (currentScale - scaleStep)) * transY - ((1 - currentScale) * transY - currentY) * (currentScale - scaleStep) / currentScale).scale(currentScale - scaleStep))
   }
 
+  function renderSearchPoint(stations) {
+    const searchStations = subway.getSearchPointArray(stations)
+    console.log('arg: ', { stations })
+    console.log('searchStations: ', searchStations)
+
+    selected = true
+    d3.selectAll('.origin').attr('opacity', 0.1)
+    d3.selectAll('.animate1').attr('display', 'none')
+    d3.selectAll('.animate2').attr('display', 'none')
+    d3.selectAll('.temp').remove()
+
+    for (let i = 0; i < searchStations.length; i++) {
+      const item = searchStations[i]
+      const box = point.append('g').attr('class', 'temp')
+
+      if (item.ex) {
+        box.append('image')
+          .attr('href', 'src/assets/trans.png')
+          .attr('x', item.x - 8)
+          .attr('y', item.y - 8)
+          .attr('width', 16)
+          .attr('height', 16)
+          .attr('id', item.sid)
+      }
+      else {
+        box.append('circle')
+          .attr('cx', item.x)
+          .attr('cy', item.y)
+          .attr('r', 5)
+          .attr('class', 'points origin')
+          .attr('id', item.sid)
+          .attr('stroke', item.lc)
+          .attr('stroke-width', 1.5)
+          .attr('fill', '#ffffff')
+      }
+      box.append('text')
+        .attr('x', item.x + item.rx)
+        .attr('y', item.y + item.ry)
+        .attr('dx', '0.3em')
+        .attr('dy', '1.1em')
+        .attr('font-size', 11)
+        .attr('class', 'point-text origin')
+        .attr('lid', item.lid)
+        .attr('id', item.sid)
+        .text(item.lb)
+    }
+  }
+
   return {
     scale,
+    renderSearchPoint,
   }
 }
 

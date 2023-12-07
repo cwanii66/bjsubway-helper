@@ -2,7 +2,7 @@
 <script setup lang="ts" generic="T extends any, O extends any">
 import BJSMap from '~/components/BJSMap.vue'
 import { sideController, stations } from '~/service/control'
-
+import { createRenderer } from '~/service/render'
 import { Request } from '~/utils'
 import { bdSubwayUrl } from '~/constants'
 
@@ -14,10 +14,21 @@ const {
   options,
   submitForm,
   resetForm,
+
+  drawer,
+  drawerContent,
+  cancelClick,
+  confirmClick,
 } = sideController
 
 Request.get(bdSubwayUrl).then(() => {
   // console.log(res.subways.l)
+})
+
+let renderSearchPoint: (stations: string[]) => void
+
+onMounted(() => {
+  renderSearchPoint = createRenderer().renderSearchPoint
 })
 </script>
 
@@ -52,7 +63,7 @@ Request.get(bdSubwayUrl).then(() => {
         />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="submitForm.call(sideController, ruleForm)">
+        <el-button type="primary" @click="renderSearchPoint(submitForm.call(sideController, ruleForm)[1])">
           查询
         </el-button>
         <el-button @click="resetForm(ruleFormRef)">
@@ -64,4 +75,21 @@ Request.get(bdSubwayUrl).then(() => {
   <div class="map-container">
     <BJSMap />
   </div>
+  <el-drawer
+    v-model="drawer"
+    title="BJSUBWAY-HELPER：查询结果面板"
+    direction="btt" :modal="false"
+    :close-on-click-modal="false"
+    :lock-scroll="false"
+  >
+    <template #default>
+      <p>{{ drawerContent }}</p>
+    </template>
+    <template #footer>
+      <div style="flex: auto">
+        <el-button @click="cancelClick.call(sideController)">取消</el-button>
+        <el-button type="primary" @click="confirmClick.call(sideController)">确认</el-button>
+      </div>
+    </template>
+  </el-drawer>
 </template>

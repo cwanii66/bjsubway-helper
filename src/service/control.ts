@@ -1,8 +1,6 @@
 /* eslint-disable no-console */
 import type { FormInstance, FormRules } from 'element-plus'
-import type { Ref } from 'vue'
-import { reactive, ref } from 'vue'
-import { ElMessageBox } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { createSubwayMap, reloadData, subwayData } from './data'
 import { createIntersectionMatrix, dijkstra, leastExchange } from './calc'
 
@@ -76,21 +74,17 @@ const { lines_data, weights } = reloadData()
 const [station_dict, line_dict] = createSubwayMap(lines_data, weights)
 
 class SideController {
-  private static instance: SideController
+  static instance: SideController = new SideController()
   formSize: Ref<string>
   ruleFormRef: Ref<FormInstance | undefined>
   ruleForm: RuleForm
   rules: FormRules<RuleForm>
   options: { value: number; label: string }[]
 
-  searchResult!: any
+  drawer: Ref<boolean> = ref(false)
+  drawerContent: Ref<string> = ref('')
 
-  static getSideController() {
-    // 单例模式
-    if (!this.instance)
-      this.instance = new SideController()
-    return this.instance
-  }
+  searchResult!: any
 
   private constructor() {
     this.formSize = formSize
@@ -100,18 +94,23 @@ class SideController {
     this.options = options
   }
 
-  async submitForm(ruleForm: RuleForm) {
+  submitForm(ruleForm: RuleForm) {
     switch (ruleForm.plan) {
       case 0: // 换乘最少
         this.minTransferSubmit(ruleForm)
+        ElMessage.success('查询成功：换乘最少')
         break
       case 1: // 用时最短
         this.minTimeSubmit(ruleForm)
+        ElMessage.success('查询成功：用时最短')
         break
       default:
         console.error('plan error')
+        ElMessage.error('plan error')
     }
-    this.showSearchMessage()
+    // this.showSearchMessage()
+    this.setDrawer(this.searchResult[1])
+    return this.searchResult
   }
 
   minTransferSubmit(ruleForm: RuleForm) {
@@ -121,6 +120,14 @@ class SideController {
 
   minTimeSubmit(ruleForm: RuleForm) {
     this.searchResult = dijkstra(station_dict, ruleForm.start, ruleForm.end)
+  }
+
+  setDrawer(content: string | string[]) {
+    this.drawer.value = true
+    if (Array.isArray(content))
+      this.drawerContent.value = content.join(' → ')
+    else
+      this.drawerContent.value = content
   }
 
   showSearchMessage() {
@@ -146,6 +153,14 @@ class SideController {
     ).catch(() => {})
   }
 
+  cancelClick() {
+    this.drawer.value = false
+  }
+
+  confirmClick() {
+    this.drawer.value = false
+  }
+
   resetForm(formEl: FormInstance | undefined) {
     if (!formEl)
       return
@@ -153,4 +168,4 @@ class SideController {
   }
 }
 
-export const sideController = SideController.getSideController()
+export const sideController = SideController.instance
