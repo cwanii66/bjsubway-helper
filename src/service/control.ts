@@ -106,7 +106,6 @@ class SideController {
     if (
       !ruleForm.start
       || !ruleForm.end
-      || !ruleForm.plan
       || ruleForm.start === ruleForm.end
     ) {
       ElMessage.error('请填写正确的信息')
