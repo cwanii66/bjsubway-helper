@@ -558,6 +558,9 @@ export function createRenderer() {
   }
 
   function renderSearchPoint(stations) {
+    if (!stations || !stations.length)
+      return
+
     const searchStations = subway.getSearchPointArray(stations)
     console.log('arg: ', { stations })
     console.log('searchStations: ', searchStations)

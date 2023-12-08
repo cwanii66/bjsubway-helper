@@ -79,7 +79,7 @@ export function createSubwayMap(lines_data, weights) {
 
 function getAllStObjs() {
   return subwayData.flatMap((line) => {
-    const { ld: lid, lc, lbx, lby } = line.l_xmlattr
+    const { lb: lid, lc, lbx, lby } = line.l_xmlattr
     return line.p
       .filter(station => station.p_xmlattr.st)
       .map(station => ({
@@ -264,6 +264,45 @@ export class Subway { // use for painting
   getSearchPointArray(stations) {
     const searchStations = extractStations(stations)
     return searchStations
+  }
+
+  getSearchPathArray(name) {
+    const allBugLineName = this.bugLineArray.map(d => d.lines).flat(1)
+    const d = this.data.filter(d => d.l_xmlattr.lid === name)[0]
+    const { loop, lc, lbx, lby, lb, lid } = d.l_xmlattr
+    const allPoints = d.p.slice(0)
+    loop && allPoints.push(allPoints[0])
+    const allStations = []
+    allPoints.forEach((item, index) => {
+      const tempObject = {}
+      Object.keys(item.p_xmlattr).forEach((d) => {
+        tempObject[d] = item.p_xmlattr[d]
+      })
+      tempObject.index = index
+      item.p_xmlattr.st && allStations.push(tempObject)
+    })
+    const arr = []
+    for (let i = 0; i < allStations.length - 1; i++) {
+      const path = this.formatPath(allPoints, allStations[i].index, allStations[i + 1].index)
+      const sid = `${allStations[i].sid}_${allStations[i + 1].sid}`
+      arr.push({
+        lid,
+        id: sid,
+        path,
+        color: !allBugLineName.includes(sid) ? lc.replace(/0x/, '#') : '#333',
+      })
+    }
+    return {
+      path: arr,
+      lc: lc.replace(/0x/, '#'),
+      lb,
+
+      lbx,
+
+      lby,
+
+      lid,
+    }
   }
 
   getLineNameArray() {

@@ -103,6 +103,16 @@ class SideController {
   }
 
   submitForm(ruleForm: RuleForm) {
+    if (
+      !ruleForm.start
+      || !ruleForm.end
+      || !ruleForm.plan
+      || ruleForm.start === ruleForm.end
+    ) {
+      ElMessage.error('请填写正确的信息')
+      return
+    }
+
     switch (ruleForm.plan) {
       case 0: // 换乘最少
         this.minTransferSubmit(ruleForm)
