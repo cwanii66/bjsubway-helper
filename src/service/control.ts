@@ -2,7 +2,7 @@
 import type { FormInstance, FormRules } from 'element-plus'
 import { ElMessage } from 'element-plus'
 import { createSubwayMap, reloadData, subwayData } from './data'
-import { calcFare1, createIntersectionMatrix, dijkstra, Dijkstra as fixTicketDiji, leastExchange } from './calc'
+import { calcFare, createIntersectionMatrix, dijkstra, leastExchange } from './calc'
 
 interface RuleForm {
   start: string
@@ -143,9 +143,7 @@ class SideController {
     this.drawer.value = true
     this.drawerContent.value.route = content[1].join(' → ')
     this.drawerContent.value.int_as_weight = content[0]
-    this.drawerContent.value.price = calcFare1(
-      fixTicketDiji.shortestPath(ruleForm.start, ruleForm.end),
-    )
+    this.drawerContent.value.price = calcFare(content[0])
   }
 
   cancelClick() {

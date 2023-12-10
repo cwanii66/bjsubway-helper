@@ -79,6 +79,7 @@ onMounted(() => {
     v-model="drawer"
     title="BJSUBWAY-HELPER：查询结果面板"
     direction="btt"
+    size="41%"
     :modal="false"
     :lock-scroll="false"
   >

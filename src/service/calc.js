@@ -1,109 +1,16 @@
 import { Member, MinHeap, Selection, decHeap, emptyHeap, initHeap, topHeap } from './data'
 
-import { MAX, edgesData } from '~/constants'
+import { MAX } from '~/constants'
 
-export const Dijkstra = (function () {
-  const graph = {}
-  // source起点    target终点    weight权重
-  function addEdge(source, target, weight) {
-    if (!(source in graph))
-      graph[source] = {}
-    if (!(target in graph))
-      graph[target] = {}
-    if (typeof weight !== 'number')
-      weight = 1
-    graph[source][target] = weight
-    graph[target][source] = weight
-  }
-  function addEdges(edges) {
-    for (let i = 0; i < edges.length; ++i) {
-      const edge = edges[i]
-      addEdge(edge[0], edge[1], edge[2])
-    }
-  }
-
-  // 通过起点终点求最小路径
-  function shortestPath(source, target) {
-    if (!(source in graph) || !(target in graph))
-      return 1 / 0 // 取1/0为无穷大，将邻接矩阵所有元素赋值正无穷
-    const dist = {} // 存放最小距离
-    const visited = {} // 判断是否到达过该点
-    let numVertex = 0
-
-    for (const v in graph) {
-      dist[v] = 1 / 0 // 初始化最小距离的数组全为无穷大
-      numVertex++
-    }
-    dist[source] = 0
-
-    // 求最小路径核心
-    for (let i = 0; i < numVertex; ++i) {
-      let minDist = 1 / 0
-      let minV
-
-      for (const v in dist) {
-        if (!(v in visited)) {
-          if (minDist > dist[v]) {
-            minDist = dist[v]
-            minV = v
-          }
-        }
-        else { ; }
-      }
-      if (!minV)
-        break
-      if (minV === target)
-        return minDist
-
-      visited[minV] = true
-      const edges = graph[minV]
-      for (const v in edges) {
-        if (!(v in visited)) {
-          const newDist = minDist + edges[v]
-          if (dist[v] > newDist)
-            dist[v] = newDist
-        }
-      }
-    }
-    return null
-  }
-
-  // 定义联结矩阵存放距离
-
-  return {
-    addEdge,
-    addEdges,
-    shortestPath,
-  }
-})()
-
-function initDijkstra() {
-  Dijkstra.addEdges(edgesData)
-}
-
-export function calcFare1(distance) {
-  if (distance <= 3)
-    return 2
-  if (distance <= 6)
+export function calcFare(int_as_weight) {
+  if (int_as_weight <= 6)
     return 3
-  if (distance <= 18)
-    return 3 + Math.ceil((distance - 6) / 6)
-  if (distance <= 42)
-    return 5 + Math.ceil((distance - 18) / 12)
-  else return 7 + Math.ceil((distance - 42) / 18)
-}
-
-export function calcFare2(distance) {
-  if (distance <= 6)
-    return 3
-  if (distance <= 12)
+  if (int_as_weight <= 12)
     return 4
-  if (distance <= 32)
-    return 4 + Math.ceil((distance - 12) / 10)
-  else return 6 + Math.ceil((distance - 32) / 20)
+  if (int_as_weight <= 32)
+    return 4 + Math.ceil((int_as_weight - 12) / 10)
+  else return 6 + Math.ceil((int_as_weight - 32) / 20)
 }
-
-initDijkstra()
 
 export function createIntersectionMatrix(line_dict) {
   // const lineSize = Object.keys(line_dict).length
